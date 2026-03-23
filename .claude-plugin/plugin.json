@@ -1,0 +1,11 @@
+{
+  "name": "inlustra-skills",
+  "description": "Adversarial review and other development skills by Inlustra",
+  "version": "0.1.0",
+  "author": {
+    "name": "Inlustra"
+  },
+  "homepage": "https://github.com/Inlustra/Skills",
+  "repository": "https://github.com/Inlustra/Skills",
+  "license": "MIT"
+}

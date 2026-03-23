@@ -1,0 +1,12 @@
+{
+  "name": "@inlustra/claude-skills",
+  "version": "0.1.0",
+  "description": "A collection of Claude Code skills for adversarial review and more",
+  "keywords": ["claude-code", "skill", "plugin", "adversarial-review"],
+  "author": "Inlustra",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Inlustra/Skills.git"
+  }
+}
