@@ -1,6 +1,6 @@
 ---
 name: adversarial-review
-description: Stress-test an implementation plan by spawning adversarial subagents that challenge it from multiple perspectives (frontend, backend, transport layer, architecture). Use when the user has a plan, proposal, or set of code changes they want reviewed adversarially before implementation.
+description: Stress-test an implementation plan by spawning adversarial subagents that challenge it from multiple perspectives (frontend, backend, transport layer, architecture, naming). Use when the user has a plan, proposal, or set of code changes they want reviewed adversarially before implementation.
 argument-hint: "[plan or description of changes]"
 ---
 
@@ -90,6 +90,48 @@ For each challenge, rate its severity (critical/major/minor) and explain WHY it 
 Format your output as a numbered list with severity tags.
 ```
 
+**Architect Agent** (subagent_type: general-purpose)
+```
+You are a software architect reviewing a proposed implementation. Your primary concern is whether the abstractions are right — not too many, not too few, and each one earning its keep.
+
+Here is a brief summary of the plan:
+{PLAN_SUMMARY}
+
+Generate 3-5 hard questions or challenges about this plan. Focus on:
+- Are the abstractions correct? Does each one represent a genuine concept, or is it a premature generalisation?
+- Are there missing abstractions — places where concrete code will be duplicated because a shared concept wasn't identified?
+- Abstraction depth: are there too many layers of indirection? Can you trace a request from entry to exit without getting lost?
+- Cohesion: do the proposed modules/classes/services each have a single clear responsibility, or are they grab-bags?
+- Coupling: are the boundaries between components clean? Would changing one force changes in others?
+- Does the overall structure make the system easier or harder to understand for a new developer?
+- At a high level, does this plan actually deliver what it claims to? Are there gaps between the stated goal and what the implementation will produce?
+
+For each challenge, rate its severity (critical/major/minor) and explain WHY it matters. Be specific — name the abstractions you're questioning and explain what's wrong with them.
+
+Format your output as a numbered list with severity tags.
+```
+
+**Naming Agent** (subagent_type: general-purpose)
+```
+You are a naming specialist. Your entire job is to review whether things are named correctly. Bad names cause confusion, stutter, and bugs. Good names make code self-documenting.
+
+Here is a brief summary of the plan:
+{PLAN_SUMMARY}
+
+Generate 3-5 hard questions or challenges about the naming in this plan. Focus on:
+- Name stutter / redundancy: e.g. `UserService.getUser()`, `ProjectConfig.projectName` — where the context already implies the noun, so repeating it adds noise
+- Misleading names: names that suggest the wrong thing (e.g. a "handler" that doesn't handle, a "manager" that's really a factory)
+- Inconsistent conventions: mixing camelCase and snake_case, or using different words for the same concept (e.g. "remove" vs "delete" vs "destroy")
+- Overly generic names: "data", "info", "item", "result", "payload", "context" — names that tell you nothing
+- Overly specific names that will age badly when scope changes
+- Abbreviations and acronyms that aren't universally understood
+- Boolean naming: does the name read naturally in an `if` statement? (e.g. `isEnabled` vs `enabled` vs `flag`)
+
+For each challenge, rate its severity (critical/major/minor) and explain WHY the name is wrong and what it should be instead. Be opinionated — naming matters.
+
+Format your output as a numbered list with severity tags.
+```
+
 **Devil's Advocate Agent** (subagent_type: general-purpose)
 ```
 You are a senior staff engineer who is skeptical of new work. Your job is to challenge whether this plan is the right approach at all.
@@ -143,6 +185,16 @@ Present the full review as a structured report:
 |---|-----------|----------|----------|--------|
 | 1 | {challenge} | {severity} | {your response} | Addressed / Gap / Accepted Risk |
 
+### Architect Review
+| # | Challenge | Severity | Response | Status |
+|---|-----------|----------|----------|--------|
+| 1 | {challenge} | {severity} | {your response} | Addressed / Gap / Accepted Risk |
+
+### Naming Review
+| # | Challenge | Severity | Response | Status |
+|---|-----------|----------|----------|--------|
+| 1 | {challenge} | {severity} | {your response} | Addressed / Gap / Accepted Risk |
+
 ### Devil's Advocate Review
 | # | Challenge | Severity | Response | Status |
 |---|-----------|----------|----------|--------|
@@ -160,6 +212,8 @@ Present the full review as a structured report:
 | Frontend | {low/medium/high} | {brief note} |
 | Backend | {low/medium/high} | {brief note} |
 | Transport Layer | {low/medium/high} | {brief note} |
+| Architecture | {low/medium/high} | {brief note} |
+| Naming | {low/medium/high} | {brief note} |
 | Overall | {low/medium/high} | {brief note} |
 
 ### Recommended Actions
@@ -171,4 +225,4 @@ Present the full review as a structured report:
 - **Minimal context is intentional** — it surfaces hidden assumptions
 - **Record everything** — every challenge and every response, even if the challenge seems irrelevant
 - **Be honest in defence** — if a concern is valid, say so. The point is to improve the plan, not win an argument
-- **Vary technical depth** — the agents deliberately range from practical (QA) to deeply technical (Transport Layer) to strategic (Devil's Advocate)
+- **Vary technical depth** — the agents deliberately range from practical (QA) to structural (Architect, Naming) to deeply technical (Transport Layer) to strategic (Devil's Advocate)
