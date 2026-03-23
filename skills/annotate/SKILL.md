@@ -27,7 +27,18 @@ The user should provide one of:
 
 Read the code. Understand what changed and why before spawning agents.
 
-### Step 2: Spawn Annotation Agents
+### Step 2: Resolve the Panel
+
+Before spawning agents, check if a **generated panel** exists for the area being reviewed:
+
+1. Look for `.claude/review-panels/` in the project root
+2. Find the most relevant panel for the area being reviewed (e.g. `api/` panel for API changes, `root/` as fallback)
+3. If a panel exists, read the agent `.md` files and use the **JSON Prompt** variant from each
+4. If no panel exists, fall back to the default agents defined below
+
+Tell the user which panel you're using (or that you're using defaults). If the defaults feel wrong for the codebase, suggest they run `/inlustra-skills:generate` first.
+
+### Step 3: Spawn Annotation Agents
 
 Launch the following agents **in parallel**. Each receives the code/diff and must return findings with **exact file paths and line numbers**.
 
@@ -185,14 +196,14 @@ Return your findings as a JSON array:
 Return ONLY the JSON array, no other text.
 ```
 
-### Step 3: Collate and Deduplicate
+### Step 4: Collate and Deduplicate
 
 1. Parse the JSON arrays from each agent
 2. Tag each annotation with its agent as the `author` field (e.g. "Architect", "Naming", "Tighten", "Silent Divergence")
 3. Deduplicate: if two agents flag the same line for the same reason, keep the more specific one
 4. Sort by file, then by line number
 
-### Step 4: Review Gate
+### Step 5: Review Gate
 
 **Before anything goes to Plannotator, you must review every annotation yourself.** Agents produce noise — generic observations, obvious comments, things the author clearly already considered. Your job is to filter.
 
@@ -213,7 +224,7 @@ For each annotation, read the actual code at that line and ask:
 
 Present the filtered list to yourself as a check before proceeding. The goal is: **every annotation that reaches Plannotator should make the reader stop and think.** If it doesn't clear that bar, cut it.
 
-### Step 5: Render Through Plannotator
+### Step 6: Render Through Plannotator
 
 Generate a markdown document containing the reviewed code with all annotations embedded, then open it with Plannotator:
 
@@ -235,7 +246,7 @@ Before opening Plannotator, present a quick summary to the user showing what sur
 Opening in Plannotator...
 ```
 
-### Step 6: Handle Feedback
+### Step 7: Handle Feedback
 
 When the user sends feedback from Plannotator (approved, dismissed, or modified annotations):
 - **Approved annotations**: apply the suggested changes (REPLACEMENT, DELETION, INSERTION)

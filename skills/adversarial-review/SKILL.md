@@ -19,9 +19,20 @@ If the context is unclear, ask the user to clarify before proceeding.
 
 Summarise the plan back to the user in bullet points before starting the review.
 
-### Step 2: Spawn the Adversarial Panel
+### Step 2: Resolve the Panel
 
-Launch the following subagents **in parallel** using the Agent tool. Each agent should receive:
+Before spawning agents, check if a **generated panel** exists for the area being reviewed:
+
+1. Look for `.claude/review-panels/` in the project root
+2. Find the most relevant panel for the area being reviewed (e.g. `api/` panel for API changes, `root/` as fallback)
+3. If a panel exists, read the agent `.md` files and use the **Prompt** variant from each
+4. If no panel exists, fall back to the default agents defined below
+
+Tell the user which panel you're using (or that you're using defaults). If the defaults feel wrong for the codebase, suggest they run `/inlustra-skills:generate` first.
+
+### Step 3: Spawn the Adversarial Panel
+
+Launch the resolved agents **in parallel** using the Agent tool. Each agent should receive:
 - A brief summary of the plan (2-3 sentences max — keep context minimal on purpose)
 - Their specific role and perspective
 - Instructions to generate 3-5 pointed challenges/questions
@@ -151,14 +162,14 @@ For each challenge, rate its severity (critical/major/minor) and explain WHY it 
 Format your output as a numbered list with severity tags.
 ```
 
-### Step 3: Defend the Plan
+### Step 4: Defend the Plan
 
 For each agent's challenges, provide a response:
 - **Addressed**: Explain how the plan already handles this concern
 - **Acknowledged Gap**: The concern is valid and the plan should be updated
 - **Accepted Risk**: The concern is valid but the trade-off is intentional — explain why
 
-### Step 4: Generate the Report
+### Step 5: Generate the Report
 
 Present the full review as a structured report:
 
