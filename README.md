@@ -14,66 +14,40 @@ A collection of Claude Code skills for use across all your repositories, distrib
 
 ## Skills
 
-### `/inlustra-skills:adversarial-review`
+### `/inlustra-skills:choose-your-fighter`
 
-An adversarial review skill that stress-tests your implementation plans before you write a single line of code.
+Inspect a repo (or area of a repo) and **assemble a tailored fight card**. Scans your code, dependencies, and patterns to generate fighters that know where the bugs live in your specific project.
 
-**How it works:**
+- **Surface scan** (default): package.json, file tree, configs
+- **Deep scan**: key source files, git hotspots, past bug patterns, test coverage gaps
+- **Monorepo-aware**: separate arenas per area (`fighters/api/`, `fighters/web/`, `fighters/shared/`)
 
-Given an implementation plan (or code changes + context), the skill spawns a panel of adversarial subagents — each with a different perspective and level of technical depth. These agents are given *minimal context on purpose* — they ask hard questions, poke holes, and surface edge cases you haven't considered.
-
-**The adversarial panel:**
-
-| Agent | Role | Focus |
-|-------|------|-------|
-| **Frontend E2E** | QA Engineer | "How will this break in the browser? What about loading states, race conditions, accessibility?" |
-| **Backend Systems** | Backend Engineer | "What about data integrity, migrations, performance under load, error propagation?" |
-| **Transport Layer** | API/Protocol Specialist | "API contracts, protocol choice (REST/GraphQL/gRPC/WS), N+1 queries, breaking changes, type safety across the boundary, serialisation?" |
-| **Architect** | Software Architect | "Are the abstractions right? Too many layers? Missing concepts? Does this actually deliver what it claims?" |
-| **Naming** | Naming Specialist | "Name stutter, misleading names, inconsistent conventions, overly generic identifiers, booleans that don't read naturally?" |
-| **Devil's Advocate** | Senior Engineer | "Why build this at all? What's the simplest alternative? What are you over-engineering?" |
-
-Each agent generates challenges at varying levels of technical depth. Your job (as the orchestrating Claude) is to defend the plan — explaining how each concern is addressed or acknowledging gaps.
-
-**Output:**
-
-Everything generated during the review is recorded and presented as a structured report:
-
-- Each agent's challenges and questions
-- Your responses/defences for each
-- Unresolved concerns flagged for human review
-- A confidence score per area (frontend, backend, API)
-
-**Usage:**
+Presents a rationale first ("I created a Prisma fighter because you have 47 migrations"), you approve/edit, then it saves editable markdown fighter files to `.claude/fighters/{arena}/`.
 
 ```
-/inlustra-skills:adversarial-review
+/inlustra-skills:choose-your-fighter src/api
 ```
 
-Then provide or reference your implementation plan. The skill handles the rest.
+### `/inlustra-skills:fight`
 
-### `/inlustra-skills:generate`
+Run your fighters against a plan or code. **Auto-detects** what you're fighting:
 
-Inspect a repo (or area of a repo) and **generate a tailored review panel**. Instead of using the default agents, this skill scans your actual code, dependencies, and patterns to produce agents that catch the real bugs in your specific project.
+- **Fighting a plan**: challenges the idea before code exists. Fighters poke holes in your design, abstractions, naming, and approach. You defend or acknowledge gaps. Output: structured fight report.
+- **Fighting code**: challenges the implementation after code exists. If [Plannotator](https://github.com/backnotprop/plannotator) is installed, findings are rendered as **inline annotations** pinned to exact lines — interactive, dismissable, author-attributed. Without Plannotator, falls back to a text report.
 
-- **Surface scan** (default): reads package.json, file tree, configs
-- **Deep scan**: reads key source files, git hotspots, past bug patterns, test coverage gaps
-- **Monorepo-aware**: generates separate panels per area (`api/`, `web/`, `shared/`)
+Automatically resolves the right arena from the file path. Includes a **review gate** that filters fighter noise — every finding that reaches you should make you stop and think.
 
-Outputs markdown agent files to `.claude/review-panels/{area}/` — human-readable, editable. The `adversarial-review` and `annotate` skills automatically pick these up.
+**Default fighters** (used when no arena has been generated):
 
-```
-/inlustra-skills:generate src/api
-```
-
-### `/inlustra-skills:annotate`
-
-Adversarial code review that outputs **inline annotations via Plannotator**. Same multi-agent approach, but instead of a report, findings are pinned to exact lines in your code — visible in the browser, interactive, dismissable. Each agent appears as a named author.
-
-Includes a **review gate** that filters agent noise before anything reaches Plannotator. Requires the [Plannotator plugin](https://github.com/backnotprop/plannotator).
+| Fighter | Fights For |
+|---------|-----------|
+| **Architect** | Are the abstractions right? Too many layers? Missing concepts? |
+| **Naming** | Stutter, misleading names, inconsistent conventions, generic identifiers |
+| **Tighten** | Loose types, unnecessary optionality, wide permissions |
+| **Devil's Advocate** | Is this the simplest solution? What's over-engineered? |
 
 ```
-/inlustra-skills:annotate
+/inlustra-skills:fight
 ```
 
 ### `/inlustra-skills:tighten`
@@ -119,12 +93,10 @@ Skills/
 │   ├── plugin.json              # Plugin manifest
 │   └── marketplace.json         # Marketplace definition
 ├── skills/
-│   ├── adversarial-review/
-│   │   └── SKILL.md             # Stress-test plans
-│   ├── generate/
-│   │   └── SKILL.md             # Generate tailored review panels
-│   ├── annotate/
-│   │   └── SKILL.md             # Inline annotations via Plannotator
+│   ├── choose-your-fighter/
+│   │   └── SKILL.md             # Assemble tailored fight card
+│   ├── fight/
+│   │   └── SKILL.md             # Run fighters against plans or code
 │   ├── tighten/
 │   │   └── SKILL.md             # Tighten loose contracts
 │   ├── trace/
