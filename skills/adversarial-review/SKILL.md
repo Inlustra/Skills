@@ -1,6 +1,6 @@
 ---
 name: adversarial-review
-description: Stress-test an implementation plan by spawning adversarial subagents that challenge it from multiple perspectives (frontend, backend, GraphQL, architecture). Use when the user has a plan, proposal, or set of code changes they want reviewed adversarially before implementation.
+description: Stress-test an implementation plan by spawning adversarial subagents that challenge it from multiple perspectives (frontend, backend, transport layer, architecture). Use when the user has a plan, proposal, or set of code changes they want reviewed adversarially before implementation.
 argument-hint: "[plan or description of changes]"
 ---
 
@@ -68,22 +68,24 @@ For each challenge, rate its severity (critical/major/minor) and explain WHY it 
 Format your output as a numbered list with severity tags.
 ```
 
-**GraphQL Specialist Agent** (subagent_type: general-purpose)
+**Transport Layer Agent** (subagent_type: general-purpose)
 ```
-You are a GraphQL API specialist reviewing a proposed implementation. You are deeply technical and opinionated about schema design.
+You are a transport layer specialist reviewing a proposed implementation. You are deeply technical and opinionated about how clients and servers communicate — whether that's GraphQL, REST, gRPC, WebSockets, or anything else.
 
 Here is a brief summary of the plan:
 {PLAN_SUMMARY}
 
 Generate 3-5 hard questions or challenges about this plan. Focus on:
-- Schema design decisions and naming conventions
-- Breaking changes to existing queries/mutations
-- Resolver complexity and N+1 query risks
-- Type safety across the client-server boundary
-- Pagination, filtering, and query complexity limits
-- Federation/stitching concerns if applicable
+- API contract design: naming, versioning, backwards compatibility
+- Breaking changes to existing endpoints, queries, or message schemas
+- Query/request complexity: N+1 problems, over-fetching, under-fetching
+- Type safety across the client-server boundary (codegen, schemas, contracts)
+- Pagination, filtering, and rate limiting
+- Protocol choice: is this the right transport for the use case? (REST vs GraphQL vs gRPC vs WebSocket vs SSE)
+- Serialisation concerns: payload size, binary vs text, streaming
+- Federation, gateway, or service mesh concerns if applicable
 
-For each challenge, rate its severity (critical/major/minor) and explain WHY it matters. Be very technical — reference specific GraphQL patterns and anti-patterns.
+For each challenge, rate its severity (critical/major/minor) and explain WHY it matters. Be very technical — reference specific patterns and anti-patterns for the relevant transport protocol.
 
 Format your output as a numbered list with severity tags.
 ```
@@ -136,7 +138,7 @@ Present the full review as a structured report:
 |---|-----------|----------|----------|--------|
 | 1 | {challenge} | {severity} | {your response} | Addressed / Gap / Accepted Risk |
 
-### GraphQL Review
+### Transport Layer Review
 | # | Challenge | Severity | Response | Status |
 |---|-----------|----------|----------|--------|
 | 1 | {challenge} | {severity} | {your response} | Addressed / Gap / Accepted Risk |
@@ -157,7 +159,7 @@ Present the full review as a structured report:
 |------|-------|-------|
 | Frontend | {low/medium/high} | {brief note} |
 | Backend | {low/medium/high} | {brief note} |
-| API Layer | {low/medium/high} | {brief note} |
+| Transport Layer | {low/medium/high} | {brief note} |
 | Overall | {low/medium/high} | {brief note} |
 
 ### Recommended Actions
@@ -169,4 +171,4 @@ Present the full review as a structured report:
 - **Minimal context is intentional** — it surfaces hidden assumptions
 - **Record everything** — every challenge and every response, even if the challenge seems irrelevant
 - **Be honest in defence** — if a concern is valid, say so. The point is to improve the plan, not win an argument
-- **Vary technical depth** — the agents deliberately range from practical (QA) to deeply technical (GraphQL) to strategic (Devil's Advocate)
+- **Vary technical depth** — the agents deliberately range from practical (QA) to deeply technical (Transport Layer) to strategic (Devil's Advocate)

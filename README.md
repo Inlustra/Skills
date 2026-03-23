@@ -28,7 +28,7 @@ Given an implementation plan (or code changes + context), the skill spawns a pan
 |-------|------|-------|
 | **Frontend E2E** | QA Engineer | "How will this break in the browser? What about loading states, race conditions, accessibility?" |
 | **Backend Systems** | Backend Engineer | "What about data integrity, migrations, performance under load, error propagation?" |
-| **GraphQL Specialist** | API Designer | "Schema design, N+1 queries, breaking changes, resolver complexity, type safety across the boundary?" |
+| **Transport Layer** | API/Protocol Specialist | "API contracts, protocol choice (REST/GraphQL/gRPC/WS), N+1 queries, breaking changes, type safety across the boundary, serialisation?" |
 | **Devil's Advocate** | Senior Engineer | "Why build this at all? What's the simplest alternative? What are you over-engineering?" |
 
 Each agent generates challenges at varying levels of technical depth. Your job (as the orchestrating Claude) is to defend the plan — explaining how each concern is addressed or acknowledging gaps.
